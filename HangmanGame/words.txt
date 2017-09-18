@@ -1,0 +1,10 @@
+callback
+cohesion
+component
+container
+dependency
+encapsulation
+flexibility
+listener
+modularity
+observer

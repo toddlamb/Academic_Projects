@@ -1,0 +1,1 @@
+The goal of this project was to develop a RESTful API web service that would provide basic functionality inspired by facebook. You can see the deployed service in production at https://blackrabbit5500.herokuapp.com/docs/ . I was in charge of all group related testing in the client.

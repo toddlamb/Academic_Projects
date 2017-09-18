@@ -1,0 +1,8 @@
+1. Item, nesting level 1
+  * Item, nesting level 2
+    1. Item, nesting level 3
+      a. Item, nesting level 4
+      b. Item, nesting level 4
+    2. Item, nesting level 3
+  * Item, nesting level 2
+2. Item, nesting level 1
