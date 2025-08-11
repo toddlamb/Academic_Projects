@@ -1,0 +1,9 @@
+{
+  "name": "rep-counter",
+  "version": "1.0.0",
+  "description": "Simple front-end repetition counter",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo 'No tests specified'"
+  }
+}
