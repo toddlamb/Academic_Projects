@@ -28,6 +28,14 @@ npm start
 
    On unRAID, you can use the Docker or Docker Compose plugin to build and run the included `docker-compose.yml`.
 
+## unRAID plugin
+
+1. In the unRAID web UI, open **Plugins** > **Install Plugin**.
+2. Paste the raw URL to `repcounter.plg` from this folder.
+3. Click **Install** to download the files and start the container.
+
+Removing the plugin from the Plugins page stops and deletes the container.
+
 ## Usage
 
 Adjust the timing and repetition settings in the form and click **Start Workout**. The app will beep to indicate set and repetition boundaries:
