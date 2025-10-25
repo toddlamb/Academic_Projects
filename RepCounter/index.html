@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Repetition Counter</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { display:block; margin-top:10px; }
+    button { margin-top:20px; }
+  </style>
+</head>
+<body>
+  <h1>Repetition Counter</h1>
+  <form id="configForm">
+    <label>Repetition duration (ms):
+      <input type="number" id="repDuration" value="1000" />
+    </label>
+    <label>Time between repetitions (ms):
+      <input type="number" id="betweenRepDuration" value="500" />
+    </label>
+    <label>Repetitions per set:
+      <input type="number" id="repsPerSet" value="10" />
+    </label>
+    <label>Rest time between sets (ms):
+      <input type="number" id="restTime" value="5000" />
+    </label>
+    <label>Number of sets:
+      <input type="number" id="sets" value="3" />
+    </label>
+    <button type="button" id="startButton">Start Workout</button>
+  </form>
+  <div id="status"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

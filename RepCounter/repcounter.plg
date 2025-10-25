@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PLUGIN name="repcounter" author="OpenAI" version="2024.05.22" pluginURL="https://example.com/repcounter" support="https://example.com/repcounter/support">
+  <CHANGES>
+    <![CDATA[
+    Initial release.
+    ]]>
+  </CHANGES>
+
+  <FILE Name="/boot/config/plugins/repcounter/index.html">
+    <INLINE>
+<![CDATA[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Repetition Counter</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { display:block; margin-top:10px; }
+    button { margin-top:20px; }
+  </style>
+</head>
+<body>
+  <h1>Repetition Counter</h1>
+  <form id="configForm">
+    <label>Repetition duration (ms):
+      <input type="number" id="repDuration" value="1000" />
+    </label>
+    <label>Time between repetitions (ms):
+      <input type="number" id="betweenRepDuration" value="500" />
+    </label>
+    <label>Repetitions per set:
+      <input type="number" id="repsPerSet" value="10" />
+    </label>
+    <label>Rest time between sets (ms):
+      <input type="number" id="restTime" value="5000" />
+    </label>
+    <label>Number of sets:
+      <input type="number" id="sets" value="3" />
+    </label>
+    <button type="button" id="startButton">Start Workout</button>
+  </form>
+  <div id="status"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/script.js">
+    <INLINE>
+<![CDATA[
+const startButton = document.getElementById('startButton');
+const statusDiv = document.getElementById('status');
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function playBeep() {
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  oscillator.type = 'sine';
+  oscillator.frequency.value = 440;
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  oscillator.start();
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+  oscillator.stop(audioCtx.currentTime + 0.2);
+}
+
+async function beep(times) {
+  for (let i = 0; i < times; i++) {
+    playBeep();
+    await delay(300);
+  }
+}
+
+startButton.addEventListener('click', async () => {
+  startButton.disabled = true;
+
+  const repDuration = parseInt(document.getElementById('repDuration').value, 10);
+  const betweenRepDuration = parseInt(document.getElementById('betweenRepDuration').value, 10);
+  const repsPerSet = parseInt(document.getElementById('repsPerSet').value, 10);
+  const restTime = parseInt(document.getElementById('restTime').value, 10);
+  const sets = parseInt(document.getElementById('sets').value, 10);
+
+  statusDiv.textContent = 'Workout in progress...';
+
+  for (let s = 1; s <= sets; s++) {
+    await beep(2); // Set start
+    for (let r = 1; r <= repsPerSet; r++) {
+      await beep(1); // Rep start
+      await delay(repDuration);
+      await beep(1); // Rep end
+      if (r < repsPerSet) {
+        await delay(betweenRepDuration);
+      }
+    }
+    if (s < sets) {
+      statusDiv.textContent = `Resting before set ${s + 1}...`;
+      await delay(restTime);
+    }
+  }
+
+  await beep(3); // Exercise completion
+  statusDiv.textContent = 'Workout complete!';
+  startButton.disabled = false;
+});
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/server.js">
+    <INLINE>
+<![CDATA[
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const PORT = process.env.PORT || 3000;
+
+const mimeTypes = {
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.css': 'text/css'
+};
+
+const server = http.createServer((req, res) => {
+  const reqPath = req.url === '/' ? '/index.html' : req.url;
+  const filePath = path.join(__dirname, reqPath);
+  const ext = path.extname(filePath);
+  const contentType = mimeTypes[ext] || 'text/plain';
+
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/package.json">
+    <INLINE>
+<![CDATA[
+{
+  "name": "rep-counter",
+  "version": "1.0.0",
+  "description": "Simple front-end repetition counter",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo 'No tests specified'"
+  }
+}
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/Dockerfile">
+    <INLINE>
+<![CDATA[
+FROM node:18-alpine
+WORKDIR /usr/src/app
+COPY package.json .
+RUN npm install --production
+COPY . .
+EXPOSE 3000
+CMD ["npm","start"]
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/docker-compose.yml">
+    <INLINE>
+<![CDATA[
+version: "3"
+services:
+  repcounter:
+    build: .
+    ports:
+      - "3000:3000"
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/install.sh" Mode="0755">
+    <INLINE>
+<![CDATA[
+#!/bin/bash
+PLUGIN_DIR="/boot/config/plugins/repcounter"
+cd "$PLUGIN_DIR"
+docker compose up -d --build
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Name="/boot/config/plugins/repcounter/remove.sh" Mode="0755">
+    <INLINE>
+<![CDATA[
+#!/bin/bash
+PLUGIN_DIR="/boot/config/plugins/repcounter"
+cd "$PLUGIN_DIR"
+docker compose down
+rm -rf "$PLUGIN_DIR"
+]]>
+    </INLINE>
+  </FILE>
+
+  <FILE Run="/boot/config/plugins/repcounter/install.sh" Method="install"/>
+  <FILE Run="/boot/config/plugins/repcounter/install.sh" Method="upgrade"/>
+  <FILE Run="/boot/config/plugins/repcounter/remove.sh" Method="remove"/>
+</PLUGIN>
